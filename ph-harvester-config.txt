@@ -1,0 +1,77 @@
+# Example Configuration File for PowerCast Energy Harvester
+# Format: NodeID CapacitorClass VoltageClass
+# 
+# CapacitorClass Definitions (in microfarads - μF):
+# CAP_A 500
+# CAP_B 2000
+# CAP_C 220
+#
+# VoltageClass:
+#   1 = 1.2V thresholds (VMAX=1.25V, VMIN=1.02V)
+#   2 = 0.9V thresholds (VMAX=0.945V, VMIN=0.9V)
+#   3 = 0.7V thresholds (VMAX=0.738V, VMIN=0.64V)
+#
+# This file demonstrates mixed deployment for large-scale networks
+
+# Nodes 0-9: High capacity deployment (CLASS_A and CLASS_C with CLASS_1 voltage)
+0 A 1
+1 C 1
+2 A 1
+3 C 1
+4 A 1
+5 C 1
+6 A 1
+7 C 1
+8 A 1
+9 C 1
+
+# Nodes 10-19: Medium capacity deployment (CLASS_B with various voltages)
+10 B 1
+11 B 2
+12 B 3
+13 B 1
+14 B 2
+15 B 3
+16 B 1
+17 B 2
+18 B 3
+19 B 1
+
+# Nodes 20-29: Low power deployment (All classes with CLASS_3 voltage)
+20 A 3
+21 B 3
+22 C 3
+23 A 3
+24 B 3
+25 C 3
+26 A 3
+27 B 3
+28 C 3
+29 A 3
+
+# Nodes 30-39: Mixed deployment for diversity testing
+30 A 1
+31 B 2
+32 C 3
+33 B 1
+34 C 2
+35 A 3
+36 C 1
+37 A 2
+38 B 3
+39 C 1
+
+# Nodes 40-49: Uniform deployment for baseline testing
+40 A 1
+41 A 1
+42 A 1
+43 A 1
+44 A 1
+45 A 1
+46 A 1
+47 A 1
+48 A 1
+49 A 1
+
+# Additional nodes can be added as needed...
+# The helper will use sequential assignment for unlisted nodes
