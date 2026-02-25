@@ -1,33 +1,54 @@
 #!/bin/bash
 
 # PowerCast Energy Harvester - NS-3 Setup and Run Script
-# Sets up directories, builds, runs simulation, and generates plots
+# Deploys files to NS-3, builds, runs simulation, and generates plots
+#
+# Run from: ~/NS3-project/Powercast-Energy-Harvester-NS3-main/
+# Deploys to: ~/NS3-project/ns-allinone-3.44/ns-3.44/contrib/ai/examples/powercast_hardware/
 
 set -e
 
-# Get script directory (powercast_hardware)
+# Source directory (where this script lives)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Navigate to ns-3 root (4 levels up from powercast_hardware)
-NS3_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
-EXAMPLES_DIR="$SCRIPT_DIR/.."
+# NS-3 paths
+NS3_ROOT="$HOME/NS3-project/ns-allinone-3.44/ns-3.44"
+EXAMPLES_DIR="$NS3_ROOT/contrib/ai/examples"
+DEPLOY_DIR="$EXAMPLES_DIR/powercast_hardware"
 
-# Verify we're in the right place
+# Verify NS-3 exists
 if [ ! -f "$NS3_ROOT/ns3" ]; then
     echo "Error: Cannot find ns3 executable at $NS3_ROOT/ns3"
-    echo "Expected directory structure: ns-3.44/contrib/ai/examples/powercast_hardware/"
+    echo "Expected NS-3 installation at: $NS3_ROOT"
     exit 1
 fi
 
-echo "PowerCast Hardware Setup & Run"
-echo "=============================="
-echo "Script directory: $SCRIPT_DIR"
+echo "PowerCast Hardware Deploy & Run"
+echo "================================"
+echo "Source directory: $SCRIPT_DIR"
 echo "NS-3 root: $NS3_ROOT"
+echo "Deploy to: $DEPLOY_DIR"
 echo ""
 
+# Create deployment directory
+mkdir -p "$DEPLOY_DIR"
+echo "✓ Created deployment directory: $DEPLOY_DIR"
+
+# Copy source files to deployment directory
+echo "Copying files to NS-3..."
+cp -v "$SCRIPT_DIR/CMakeLists.txt" "$DEPLOY_DIR/"
+cp -v "$SCRIPT_DIR/ph-deployment-helper.cc" "$DEPLOY_DIR/"
+cp -v "$SCRIPT_DIR/ph-deployment-helper.h" "$DEPLOY_DIR/"
+cp -v "$SCRIPT_DIR/ph-harvester-demo.cc" "$DEPLOY_DIR/"
+cp -v "$SCRIPT_DIR/ph-harvester-hardware.cc" "$DEPLOY_DIR/"
+cp -v "$SCRIPT_DIR/ph-harvester-hardware.h" "$DEPLOY_DIR/"
+cp -v "$SCRIPT_DIR/ph-harvester-config.txt" "$DEPLOY_DIR/"
+cp -v "$SCRIPT_DIR/ph-harvester-plot.py" "$DEPLOY_DIR/"
+echo "✓ Files copied"
+
 # Create output directory for PCAP and CSV files
-mkdir -p "$SCRIPT_DIR/ph-pcap"
-echo "✓ Created output directory: ph-pcap/"
+mkdir -p "$DEPLOY_DIR/ph-pcap"
+echo "✓ Created output directory: $DEPLOY_DIR/ph-pcap/"
 
 # Add to CMakeLists.txt if not present
 CMAKE_FILE="$EXAMPLES_DIR/CMakeLists.txt"
@@ -56,12 +77,10 @@ echo "Running PowerCast Harvester Demo..."
 # Activate venv and run plotter
 echo ""
 echo "Generating plots..."
-cd "$SCRIPT_DIR"
+cd "$DEPLOY_DIR"
 
 # Try to find and activate virtual environment
 VENV_PATHS=(
-    "$NS3_ROOT/../EHRL/bin/activate"
-    "$NS3_ROOT/../../EHRL/bin/activate"
     "$HOME/NS3-project/EHRL/bin/activate"
     "$SCRIPT_DIR/venv/bin/activate"
 )
@@ -81,8 +100,8 @@ if [ "$VENV_ACTIVATED" = false ]; then
 fi
 
 # Run plotter
-if [ -f "$SCRIPT_DIR/ph-harvester-plot.py" ]; then
-    python3 "$SCRIPT_DIR/ph-harvester-plot.py"
+if [ -f "$DEPLOY_DIR/ph-harvester-plot.py" ]; then
+    python3 "$DEPLOY_DIR/ph-harvester-plot.py"
     echo "✓ Plots generated"
 else
     echo "⚠ Plotter script not found: ph-harvester-plot.py"
