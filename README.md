@@ -1,49 +1,95 @@
 # PowerCast Hardware Module - P21XXCSR-EVB Energy Harvester
 
+<!--
+  Copyright (c) 2025 Texas State University
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License version 2 as
+  published by the Free Software Foundation;
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+  PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
+  Texas State University
+-->
+
 ## Overview
 
 Production-grade NS-3 implementation of the **PowerCast P21XXCSR-EVB Band 6** RF energy harvester for realistic 2.4GHz WiFi energy harvesting simulations. This module provides accurate modeling of energy harvesting hardware with comprehensive safety mechanisms and flexible deployment configurations.
 
-**Author:** Ahmed Maksud (amaks002@ucr.edu)  
-**Affiliation:** SHINE Lab, Texas State University  
-**PI:** Marcelo Menezes De Carvalho  
+**Author:** Ahmed Maksud <ahmed.maksud@email.ucr.edu>  
+**PI:** Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>  
+**Affiliation:** Texas State University  
 **License:** GPL v2
 
 ## Quick Start
 
-### 1. Deploy to NS-3
+The deployment script handles everything: copying files to NS-3, building, running the simulation, and generating plots.
 
 ```bash
-cd ~/NS3-project/Powercast-Energy-Harvester-NS3-main
+# Clone the repository (from NS3-project directory)
+cd ~/NS3-project
+git clone https://github.com/ahmedmaksud/Powercast-Energy-Harvester-NS3.git
+
+# Deploy, build, run, and plot
+cd Powercast-Energy-Harvester-NS3
 ./deploy-to-ns3.sh
 ```
 
-### 2. Rebuild NS-3
+This script will:
+1. Deploy source files to `ns-3.44/contrib/ai/examples/powercast_hardware/`
+2. Update CMakeLists.txt if needed
+3. Build the `ph-harvester-demo` executable
+4. Run the simulation
+5. Activate the Python virtual environment
+6. Generate visualization plots
+
+### Prerequisites
+
+- **NS-3.44** with NS3-AI module installed (see [NS3-NS3AI--installation-and-tests](https://github.com/ahmedmaksud/NS3-NS3AI--installation-and-tests.git))
+- **Python virtual environment** at `~/NS3-project/EHRL/` with pandas and matplotlib
+
+### Manual Execution (Optional)
+
+If you prefer to run steps individually:
 
 ```bash
+# Build only
 cd ~/NS3-project/ns-allinone-3.44/ns-3.44
-./ns3 build
-```
+./ns3 build ph-harvester-demo
 
-### 3. Activate Virtual Environment
+# Run simulation with custom parameters
+./ns3 run "ph-harvester-demo --time=120 --numStas=8"
 
-```bash
+# Generate plots manually
 source ~/NS3-project/EHRL/bin/activate
-```
-
-### 4. Run the Harvester Demo
-
-```bash
-cd ~/NS3-project/ns-allinone-3.44/ns-3.44
-./ns3 run ph-harvester-demo
-```
-
-### 5. Generate the Plot
-
-```bash
-cd ~/NS3-project/ns-allinone-3.44/ns-3.44/contrib/ai/examples/powercast_hardware
+cd contrib/ai/examples/powercast_hardware
 python3 ph-harvester-plot.py
 ```
+
+### Command-Line Options
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `--time` | 180 | Simulation time in seconds |
+| `--numStas` | 8 | Number of STA nodes |
+| `--apPower` | 55 | AP transmission power (dBm) |
+| `--staPower` | 15 | STA transmission power (dBm) |
+| `--ulRate` | 1.0 | Uplink data rate (Mbps) |
+| `--dlRate` | 54.0 | Downlink data rate (Mbps) |
+| `--ulPayload` | 1 | Uplink payload size (bytes) |
+| `--dlPayload` | 2048 | Downlink payload size (bytes) |
+| `--ulMcs` | DsssRate1Mbps | Uplink MCS mode |
+| `--dlMcs` | HtMcs7 | Downlink MCS mode |
+| `--configFile` | (default path) | Path to harvester configuration file |
 
 ## Key Features
 
@@ -84,9 +130,9 @@ python3 ph-harvester-plot.py
 
 | Class | Default Value | Description | Typical Use |
 |-------|---------------|-------------|-------------|
-| **CLASS_A** | 50 mF | Super capacitor | High capacity, long operation |
-| **CLASS_B** | 2.2 mF | Electrolytic | Medium capacity, balanced |
-| **CLASS_C** | 200 mF | Custom large | Very high capacity, extended runtime |
+| **CLASS_A** | 500 μF (0.5 mF) | Electrolytic - Small | Short bursts, fast response |
+| **CLASS_B** | 2200 μF (2.2 mF) | Electrolytic - Medium | Medium capacity, balanced |
+| **CLASS_C** | 20000 μF (20 mF) | Electrolytic - Large | High capacity, long operation |
 
 **Note:** Capacitor values are loaded from `ph-harvester-config.txt` - no hardcoded defaults.
 
@@ -195,15 +241,15 @@ Comprehensive demonstration of energy harvesting in WiFi networks.
 # Voltage Classes: 1 (1.2V), 2 (0.9V), 3 (0.7V)
 
 # Capacitor value definitions (required)
-# CAP_A 50000 μF    # Class A: 50mF super capacitor
-# CAP_B 2200 μF     # Class B: 2.2mF electrolytic
-# CAP_C 200000 μF   # Class C: 200mF custom
+# CAP_A 500       # Class A: 500μF (0.5mF) electrolytic
+# CAP_B 2200      # Class B: 2200μF (2.2mF) electrolytic
+# CAP_C 20000     # Class C: 20000μF (20mF) electrolytic
 
 # Node configurations
-0 A 1    # Node 0: 50mF capacitor, 1.2V threshold
-1 B 2    # Node 1: 2.2mF capacitor, 0.9V threshold
-2 C 3    # Node 2: 200mF capacitor, 0.7V threshold
-3 A 2    # Node 3: 50mF capacitor, 0.9V threshold
+0 A 1    # Node 0: 500μF capacitor, 1.2V threshold
+1 B 2    # Node 1: 2200μF capacitor, 0.9V threshold
+2 C 3    # Node 2: 20000μF capacitor, 0.7V threshold
+3 A 2    # Node 3: 500μF capacitor, 0.9V threshold
 ```
 
 ## Usage Example
@@ -319,66 +365,10 @@ std::cout << "Capacitor Voltage: " << voltage << " V\n";
 std::cout << "Can Transmit: " << (canTransmit ? "Yes" : "No") << "\n";
 ```
 
-## Research Applications
-
-This module is suitable for research in:
-
-- ✅ **RF Energy Harvesting**: Realistic power beacon and ambient harvesting
-- ✅ **Energy-constrained Networks**: IoT and sensor network simulations
-- ✅ **Power Management**: Adaptive transmission strategies
-- ✅ **Network Lifetime**: Energy availability and duty cycling
-- ✅ **MAC Protocol Design**: Energy-aware medium access
-- ✅ **Resource Allocation**: Power and energy optimization
-
-## Performance Notes
-
-### Realistic Scenarios
-- **Typical WiFi RX Power**: -30 to -10 dBm → 10-40% efficiency
-- **Close Proximity**: -10 to 0 dBm → 40-70% efficiency
-- **Power Beacon**: 0 to +15 dBm → 70-85% efficiency
-
-### Energy Balance
-- **Harvesting Rate**: Depends on RX power and duration
-- **Consumption Rate**: Depends on TX power and duty cycle
-- **Net Energy**: Balance determines operational lifetime
-
-### Recommended Settings
-- **Small Payloads**: 1-64 bytes for energy efficiency
-- **Low TX Power**: 10-15 dBm for energy-constrained operation
-- **High Capacity Caps**: CLASS_A or CLASS_C for longer runtime
-
-## Troubleshooting
-
-### Common Issues
-
-**1. Config File Not Found**
-```
-NS_FATAL_ERROR: Could not open harvester config file
-```
-Solution: Ensure `ph-harvester-config.txt` is in the working directory or provide absolute path.
-
-**2. Negative Energy States**
-```
-NS_FATAL_ERROR: CRITICAL ERROR: Energy consumption exceeds available energy
-```
-Solution: Use `CanSustainTransmission()` before energy consumption calls.
-
-**3. No Energy Harvesting**
-```
-Available energy remains at 0
-```
-Solution: Verify PHY trace connections and received power levels (should be > -40 dBm).
-
-**4. Rapid Energy Depletion**
-```
-Energy drops to 0 quickly
-```
-Solution: Reduce TX power, increase payload efficiency, or use larger capacitor class.
-
 ## File Structure
 
 ```
-
+Powercast-Energy-Harvester-NS3/
 ├── ph-harvester-hardware.h         # Main harvester header
 ├── ph-harvester-hardware.cc        # Harvester implementation
 ├── ph-deployment-helper.h          # Helper class header
@@ -386,44 +376,13 @@ Solution: Reduce TX power, increase payload efficiency, or use larger capacitor 
 ├── ph-harvester-demo.cc            # Complete demo application
 ├── ph-harvester-config.txt         # Configuration file
 ├── ph-harvester-plot.py            # Visualization script
+├── deploy-to-ns3.sh                # Deployment and run script
 ├── CMakeLists.txt                  # Build configuration
-├── README.md                       # This file
-└── INSTALL.md                      # Installation guide
+├── powercast-hardware.drawio       # Hardware diagram (draw.io)
+├── .gitignore                      # Git ignore rules
+└── README.md                       # This file
 ```
-
-## References
-
-- **PowerCast Corporation:** P21XXCSR-EVB Datasheet v2.1
-- **IEEE 802.11:** Wireless LAN Standard
-- **NS-3 Energy Model:** Energy module documentation
-- **Research Paper:** [Add your publication here]
-
-## Citation
-
-If you use this module in your research, please cite:
-
-```bibtex
-@misc{maksud2024powercast,
-  author = {Maksud, Ahmed and De Carvalho, Marcelo Menezes},
-  title = {PowerCast Hardware Module for NS-3},
-  year = {2024},
-  institution = {SHINE Lab, Texas State University},
-  url = {https://github.com/YOUR_USERNAME/ns3-powercast-hardware}
-}
-```
-
-## Support
-
-For questions, issues, or contributions:
-- **Email:** amaks002@ucr.edu
-- **GitHub Issues:** [Repository issues page]
-- **Documentation:** See INSTALL.md for setup instructions
 
 ## License
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 2 as published by the Free Software Foundation.
-
----
-
-**PowerCast Hardware Module** - Realistic RF Energy Harvesting for NS-3  
-Built with ❤️ at SHINE Lab, Texas State University

@@ -1,10 +1,21 @@
-# PowerCast Energy Harvester Module - CMakeLists.txt
+# CMakeLists.txt for PowerCast Energy Harvester Module
 #
-# Authors: Ahmed Maksud <amaks002@ucr.edu>
-#          SHINE Lab, Texas State University
-#          PI: Marcelo Menezes De Carvalho
+# Copyright (c) 2025 Texas State University
 #
-# Production-grade RF energy harvesting hardware models based on PowerCast P21XXCSR-EVB
+# Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+# PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
+# Texas State University
+#
+# This CMake configuration builds:
+# 1. PowerCast P21XXCSR-EVB Band 6 energy harvester implementation
+# 2. Deployment helper for large-scale network scenarios
+# 3. Complete demo application with WiFi energy harvesting
+#
+# The simulation demonstrates:
+# - Realistic RF-to-DC efficiency modeling for 2.4GHz WiFi
+# - Advanced energy management with safety mechanisms
+# - Three-tier energy model (nominal/sunk/available)
+# - CSV data export for visualization and analysis
 
 # Define source and header files
 set(source_files

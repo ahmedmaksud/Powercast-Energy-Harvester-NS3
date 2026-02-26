@@ -1,9 +1,5 @@
 /*
- * Copyright (c) 2024 IPCCC Project
- *
- * Authors: Ahmed Maksud <amaks002@ucr.edu>
- *          SHINE Lab, Texas State University
- *          PI: Marcelo Menezes De Carvalho
+ * Copyright (c) 2025 Texas State University
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -11,16 +7,21 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: IPCCC Team
- *
- * ph_powercast_energy_harvester.h - Advanced PowerCast RF Energy Harvester Interface
+ * Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+ * PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
+ * Texas State University
+ */
+
+/**
+ * @file ph-harvester-hardware.h
+ * @brief Advanced PowerCast RF Energy Harvester Interface
  *
  * Header file for production-grade RF energy harvesting device based on P21XXCSR-EVB
  * Band 6 specifications. Features advanced energy management with nominal/sunk/available
@@ -36,7 +37,7 @@
  * - Critical error detection for unrealistic energy consumption scenarios
  * - Pre-transmission energy validation with CanSustainTransmission() method
  * - Output enable checking with 80% Vmin safety threshold
- * - Three-class capacitor system: 50μF, 2.2μF, 200μF configurations
+ * - Three-class capacitor system: CLASS_A, CLASS_B, CLASS_C (values from config file)
  * - Three-voltage threshold system: 1.2V, 0.9V, 0.7V operation modes
  * - Fixed 90% boost and PA efficiency from P21XXCSR-EVB specifications
  * - Comprehensive NS-3 integration with trace sources and attributes
@@ -77,12 +78,10 @@ class PowercastEnergyHarvester : public EnergyHarvester
     /**
      * \brief Capacitor class enumeration based on P21XXCSR-EVB specifications
      *
-     * Based on P21XXCSR-EVB evaluation board capacitor configurations:
-     * - CLASS_A: 50μF super capacitor (C3 on EVB) - High capacity, low ESR, long discharge time
-     * - CLASS_B: Electrolytic capacitor (C1 on EVB) - Medium capacity (configurable)
-     * time
-     * - CLASS_C: 200μF custom high-capacity configuration - Very high capacity, extended operation
-     * time
+     * Capacitor values are loaded from config file (no hardcoded defaults):
+     * - CLASS_A: Small electrolytic (default: 500μF from config)
+     * - CLASS_B: Medium electrolytic (default: 2200μF from config)
+     * - CLASS_C: Large electrolytic (default: 20000μF from config)
      */
     enum CapacitorClass
     {
@@ -132,8 +131,9 @@ class PowercastEnergyHarvester : public EnergyHarvester
     /**
      * \brief Default constructor with P21XXCSR-EVB specifications and advanced energy model
      *
-     * Initializes harvester with default CLASS_A capacitor (50μF) and CLASS_1 voltage (1.2V)
-     * thresholds. Sets up advanced energy model with nominal/sunk/available energy separation
+     * Initializes harvester with default CLASS_A capacitor and CLASS_1 voltage (1.2V)
+     * thresholds. Capacitor values must be loaded from config file before use.
+     * Sets up advanced energy model with nominal/sunk/available energy separation
      * and applies realistic 2.4GHz efficiency curve with comprehensive safety mechanisms.
      */
     PowercastEnergyHarvester();

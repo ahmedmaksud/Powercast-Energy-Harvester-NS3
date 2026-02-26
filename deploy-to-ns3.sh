@@ -1,12 +1,23 @@
 #!/bin/bash
-
-# PowerCast Energy Harvester - NS-3 Setup and Run Script
-# Deploys files to NS-3, builds, runs simulation, and generates plots
 #
-# Run from: ~/NS3-project/Powercast-Energy-Harvester-NS3-main/
+# Author: Ahmed Maksud; email: ahmed.maksud@email.ucr.edu
+# PI: Marcelo Menezes De Carvalho; email: mmcarvalho@txstate.edu
+# Texas State University
+#
+# PowerCast Energy Harvester - NS-3 Setup and Run Script
+# ======================================================
+# This script automates the complete workflow for running the PowerCast energy
+# harvesting simulation:
+# 1. Deploy source files to NS3 contrib directory
+# 2. Update CMakeLists.txt if needed
+# 3. Build the ph-harvester-demo executable
+# 4. Run the simulation
+# 5. Setup Python virtual environment and generate plots
+#
+# Usage: ./deploy-to-ns3.sh (from Powercast-Energy-Harvester-NS3 directory)
 # Deploys to: ~/NS3-project/ns-allinone-3.44/ns-3.44/contrib/ai/examples/powercast_hardware/
 
-set -e
+set -e  # Exit immediately if any command fails
 
 # Source directory (where this script lives)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -18,9 +29,9 @@ DEPLOY_DIR="$EXAMPLES_DIR/powercast_hardware"
 
 # Verify NS-3 exists
 if [ ! -f "$NS3_ROOT/ns3" ]; then
-    echo "Error: Cannot find ns3 executable at $NS3_ROOT/ns3"
-    echo "Expected NS-3 installation at: $NS3_ROOT"
-    exit 1
+	echo "Error: Cannot find ns3 executable at $NS3_ROOT/ns3"
+	echo "Expected NS-3 installation at: $NS3_ROOT"
+	exit 1
 fi
 
 echo "PowerCast Hardware Deploy & Run"
@@ -53,14 +64,14 @@ echo "✓ Created output directory: $DEPLOY_DIR/ph-pcap/"
 # Add to CMakeLists.txt if not present
 CMAKE_FILE="$EXAMPLES_DIR/CMakeLists.txt"
 if [ -f "$CMAKE_FILE" ]; then
-    if ! grep -q "powercast_hardware" "$CMAKE_FILE" 2>/dev/null; then
-        echo "add_subdirectory(powercast_hardware)" >> "$CMAKE_FILE"
-        echo "✓ Added powercast_hardware to examples/CMakeLists.txt"
-    else
-        echo "✓ powercast_hardware already in CMakeLists.txt"
-    fi
+	if ! grep -q "powercast_hardware" "$CMAKE_FILE" 2>/dev/null; then
+		echo "add_subdirectory(powercast_hardware)" >>"$CMAKE_FILE"
+		echo "✓ Added powercast_hardware to examples/CMakeLists.txt"
+	else
+		echo "✓ powercast_hardware already in CMakeLists.txt"
+	fi
 else
-    echo "⚠ Warning: $CMAKE_FILE not found"
+	echo "⚠ Warning: $CMAKE_FILE not found"
 fi
 
 # Build NS-3
@@ -81,30 +92,30 @@ cd "$DEPLOY_DIR"
 
 # Try to find and activate virtual environment
 VENV_PATHS=(
-    "$HOME/NS3-project/EHRL/bin/activate"
-    "$SCRIPT_DIR/venv/bin/activate"
+	"$HOME/NS3-project/EHRL/bin/activate"
+	"$SCRIPT_DIR/venv/bin/activate"
 )
 
 VENV_ACTIVATED=false
 for venv_path in "${VENV_PATHS[@]}"; do
-    if [ -f "$venv_path" ]; then
-        echo "✓ Activating venv: $venv_path"
-        source "$venv_path"
-        VENV_ACTIVATED=true
-        break
-    fi
+	if [ -f "$venv_path" ]; then
+		echo "✓ Activating venv: $venv_path"
+		source "$venv_path"
+		VENV_ACTIVATED=true
+		break
+	fi
 done
 
 if [ "$VENV_ACTIVATED" = false ]; then
-    echo "⚠ No venv found, using system Python"
+	echo "⚠ No venv found, using system Python"
 fi
 
 # Run plotter
 if [ -f "$DEPLOY_DIR/ph-harvester-plot.py" ]; then
-    python3 "$DEPLOY_DIR/ph-harvester-plot.py"
-    echo "✓ Plots generated"
+	python3 "$DEPLOY_DIR/ph-harvester-plot.py"
+	echo "✓ Plots generated"
 else
-    echo "⚠ Plotter script not found: ph-harvester-plot.py"
+	echo "⚠ Plotter script not found: ph-harvester-plot.py"
 fi
 
 echo ""

@@ -1,10 +1,10 @@
 # PowerCast Energy Harvester Configuration File
 # Format: NodeID CapacitorClass VoltageClass
 # 
-# CapacitorClass Definitions (in microfarads - μF):
-# CAP_A 500       (50μF Electrolytic - Small)
-# CAP_B 2200      (220μF Electrolytic - Medium)
-# CAP_C 20000     (2000μF/2mF Electrolytic - Large)
+# CapacitorClass Definitions (values in microfarads - μF):
+# CAP_A 500       (500μF / 0.5mF Electrolytic - Small)
+# CAP_B 2200      (2200μF / 2.2mF Electrolytic - Medium)
+# CAP_C 20000     (20000μF / 20mF Electrolytic - Large)
 #
 # VoltageClass:
 #   1 = 1.2V thresholds (VMAX=1.25V, VMIN=1.02V)
@@ -16,15 +16,15 @@
 # ============================================================
 # GROUP 1: All 9 combinations - Complete matrix (Nodes 0-8)
 # ============================================================
-# Small Cap (50mF) with all voltage classes
+# Small Cap (500μF / 0.5mF) with all voltage classes
 0 A 1
 1 A 2
 2 A 3
-# Medium Cap (220mF) with all voltage classes
+# Medium Cap (2200μF / 2.2mF) with all voltage classes
 3 B 1
 4 B 2
 5 B 3
-# Large Cap (2000mF) with all voltage classes
+# Large Cap (20000μF / 20mF) with all voltage classes
 6 C 1
 7 C 2
 8 C 3

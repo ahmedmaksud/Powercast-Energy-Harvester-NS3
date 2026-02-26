@@ -1,9 +1,5 @@
 /*
- * Copyright (c) 2024 IPCCC Project
- *
- * Authors: Ahmed Maksud <amaks002@ucr.edu>
- *          SHINE Lab, Texas State University
- *          PI: Marcelo Menezes De Carvalho
+ * Copyright (c) 2025 Texas State University
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -11,10 +7,21 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * ph-harvester-demo.cc - Advanced PowerCast RF Energy Harvesting Test
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+ * PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
+ * Texas State University
+ */
+
+/**
+ * @file ph-harvester-demo.cc
+ * @brief Advanced PowerCast RF Energy Harvesting Test
  *
  * Comprehensive test suite demonstrating the advanced PowerCast RF energy harvesting
  * implementation with three-tier energy model (nominal/sunk/available energy) in a WiFi
@@ -76,7 +83,7 @@ struct HarvesterConfig
 
 // Function to read harvester configuration from file
 std::map<uint32_t, HarvesterConfig>
-ReadHarvesterConfig(const std::string& filename)
+ReadHarvesterConfig(const std::string &filename)
 {
     std::map<uint32_t, HarvesterConfig> config;
     std::ifstream file(filename);
@@ -124,7 +131,7 @@ ReadHarvesterConfig(const std::string& filename)
                 NS_LOG_INFO("Loaded CAP_C from config: " << capValueUf << " μF");
             }
         }
-        
+
         // Stop parsing header once we reach node configurations
         if (!line.empty() && line[0] != '#')
         {
@@ -266,24 +273,23 @@ std::map<uint32_t, PhyEvent> g_ongoingRxEvents;
 std::map<uint32_t, PhyEvent> g_ongoingTxEvents;
 
 // CSV Logging Function - Logs all simulation events with comprehensive data
-void
-LogSimulationEvent(double timestamp,
-                   uint32_t staId,
-                   const std::string& eventType,
-                   double rxPowerDbm,
-                   double txPowerDbm,
-                   uint32_t packetSize,
-                   double durationMicroseconds,
-                   double harvestedEnergy,
-                   double consumedEnergy,
-                   double availableEnergy,
-                   double vcap,
-                   const std::string& capClass,
-                   const std::string& voltClass,
-                   bool isBlocked,
-                   bool isSuccessful,
-                   bool outputEnabled,
-                   const std::string& additionalInfo = "")
+void LogSimulationEvent(double timestamp,
+                        uint32_t staId,
+                        const std::string &eventType,
+                        double rxPowerDbm,
+                        double txPowerDbm,
+                        uint32_t packetSize,
+                        double durationMicroseconds,
+                        double harvestedEnergy,
+                        double consumedEnergy,
+                        double availableEnergy,
+                        double vcap,
+                        const std::string &capClass,
+                        const std::string &voltClass,
+                        bool isBlocked,
+                        bool isSuccessful,
+                        bool outputEnabled,
+                        const std::string &additionalInfo = "")
 {
     if (!g_simulationLogFile.is_open())
     {
@@ -298,7 +304,7 @@ LogSimulationEvent(double timestamp,
                         << durationMicroseconds << "," << std::scientific << std::setprecision(6)
                         << harvestedEnergy << "," << std::scientific << std::setprecision(6)
                         << consumedEnergy << "," << std::scientific << std::setprecision(6)
-                        << availableEnergy << "," << std::fixed << std::setprecision(8) << vcap  // Increased precision to 8 decimals
+                        << availableEnergy << "," << std::fixed << std::setprecision(8) << vcap // Increased precision to 8 decimals
                         << "," << capClass << "," << voltClass << ","
                         << (isBlocked ? "BLOCKED" : "ALLOWED") << ","
                         << (isSuccessful ? "SUCCESS" : "FAILED") << ","
@@ -307,13 +313,12 @@ LogSimulationEvent(double timestamp,
 }
 
 // Function to calculate accurate WiFi packet duration using SLOWEST possible rate (1 Mbps DSSS)
-Time
-CalculateWiFiPacketDuration(Ptr<const Packet> packet, double dataRateMbps, bool isDownlink = true)
+Time CalculateWiFiPacketDuration(Ptr<const Packet> packet, double dataRateMbps, bool isDownlink = true)
 {
     // FIXED: Always use 1 Mbps DSSS rate (802.11b) - the absolute slowest WiFi rate
     // This matches the actual STA configuration below
     const double SLOWEST_RATE_MBPS = 1.0; // 1 Mbps DSSS (802.11b)
-    
+
     // 802.11b DSSS PHY overhead components for 1 Mbps:
     // - Long PLCP Preamble: 144 μs (long training sequence for 1 Mbps)
     // - PLCP Header: 48 μs (at 1 Mbps DBPSK)
@@ -337,8 +342,7 @@ CalculateWiFiPacketDuration(Ptr<const Packet> packet, double dataRateMbps, bool 
 }
 
 // Function to check if STA has enough energy for transmission while maintaining voltage constraints
-bool
-CheckEnergyForTransmission(uint32_t staIndex, double txPowerDbm, Time txDuration)
+bool CheckEnergyForTransmission(uint32_t staIndex, double txPowerDbm, Time txDuration)
 {
     if (staIndex >= g_harvesters.size() || !g_harvesters[staIndex])
     {
@@ -354,7 +358,7 @@ CheckEnergyForTransmission(uint32_t staIndex, double txPowerDbm, Time txDuration
 // FIXED APPROACH: Pre-deduct energy before sending to prevent PHY double deduction
 class EnergyAwareUdpClient : public Application
 {
-  private:
+private:
     Ptr<Socket> m_socket;
     Address m_peer;
     uint32_t m_packetSize;
@@ -367,7 +371,7 @@ class EnergyAwareUdpClient : public Application
     EventId m_sendEvent;
     Ptr<UniformRandomVariable> m_randomInterval; // Random interval generator
 
-  public:
+public:
     EnergyAwareUdpClient()
         : m_socket(0),
           m_sent(0),
@@ -439,7 +443,7 @@ class EnergyAwareUdpClient : public Application
         }
     }
 
-  private:
+private:
     void ScheduleTransmit(Time dt)
     {
         m_sendEvent = Simulator::Schedule(dt, &EnergyAwareUdpClient::Send, this);
@@ -463,10 +467,10 @@ class EnergyAwareUdpClient : public Application
             Time txDuration =
                 CalculateWiFiPacketDuration(Create<Packet>(estimatedPhyPacketSize), m_ulDataRate, false);
 
-            NS_LOG_DEBUG("STA " << (m_staIndex + 1) << " Send() attempt " << (m_sent + 1) 
-                        << "/" << m_maxPackets 
-                        << " | Estimated TX duration: " << txDuration.GetMicroSeconds() << " μs"
-                        << " | Time: " << Simulator::Now().GetSeconds() << "s");
+            NS_LOG_DEBUG("STA " << (m_staIndex + 1) << " Send() attempt " << (m_sent + 1)
+                                << "/" << m_maxPackets
+                                << " | Estimated TX duration: " << txDuration.GetMicroSeconds() << " μs"
+                                << " | Time: " << Simulator::Now().GetSeconds() << "s");
 
             // Calculate required energy for transmission
             double txPowerWatts =
@@ -484,12 +488,12 @@ class EnergyAwareUdpClient : public Application
             {
                 // Sufficient energy - proceed with transmission
                 // Energy will be deducted in OnPhyTxEnd() with ACTUAL PHY duration
-                
-                NS_LOG_INFO("STA " << (m_staIndex + 1) << " TX Estimate: " 
-                           << txDuration.GetMicroSeconds() << " μs (from CalculateWiFiPacketDuration)"
-                           << " | Packet size: " << m_packetSize << " bytes"
-                           << " | Time: " << Simulator::Now().GetSeconds() << "s");
-                
+
+                NS_LOG_INFO("STA " << (m_staIndex + 1) << " TX Estimate: "
+                                   << txDuration.GetMicroSeconds() << " μs (from CalculateWiFiPacketDuration)"
+                                   << " | Packet size: " << m_packetSize << " bytes"
+                                   << " | Time: " << Simulator::Now().GetSeconds() << "s");
+
                 Ptr<Packet> packet = Create<Packet>(m_packetSize);
                 m_socket->Send(packet);
                 m_sent++;
@@ -556,16 +560,15 @@ class EnergyAwareUdpClient : public Application
         else
         {
             // Maximum packets reached - stop transmitting
-            NS_LOG_INFO("STA " << (m_staIndex + 1) << " reached maximum packet limit: " 
-                        << m_maxPackets << " packets sent at time " 
-                        << Simulator::Now().GetSeconds() << "s");
+            NS_LOG_INFO("STA " << (m_staIndex + 1) << " reached maximum packet limit: "
+                               << m_maxPackets << " packets sent at time "
+                               << Simulator::Now().GetSeconds() << "s");
         }
     }
 };
 
 // Statistics update function
-void
-UpdateSTAStatistics()
+void UpdateSTAStatistics()
 {
     static uint32_t updateCount = 0;
     updateCount++;
@@ -642,8 +645,7 @@ UpdateSTAStatistics()
 }
 
 // PHY RX Begin callback - stores RX start information
-void
-OnPhyRxBegin(std::string context, Ptr<const Packet> packet, RxPowerWattPerChannelBand rxPowersW)
+void OnPhyRxBegin(std::string context, Ptr<const Packet> packet, RxPowerWattPerChannelBand rxPowersW)
 {
     // Extract node ID from context (format: "/NodeList/X/...")
     std::string nodeIdStr = context.substr(10); // Skip "/NodeList/"
@@ -664,7 +666,7 @@ OnPhyRxBegin(std::string context, Ptr<const Packet> packet, RxPowerWattPerChanne
         {
             // Calculate total received power
             double totalRxPowerWatts = 0.0;
-            for (const auto& bandPower : rxPowersW)
+            for (const auto &bandPower : rxPowersW)
             {
                 totalRxPowerWatts += bandPower.second;
             }
@@ -690,8 +692,7 @@ OnPhyRxBegin(std::string context, Ptr<const Packet> packet, RxPowerWattPerChanne
 }
 
 // PHY RX End callback - calculates actual RX duration and performs energy harvesting
-void
-OnPhyRxEnd(std::string context, Ptr<const Packet> packet)
+void OnPhyRxEnd(std::string context, Ptr<const Packet> packet)
 {
     // Extract node ID from context
     std::string nodeIdStr = context.substr(10); // Skip "/NodeList/"
@@ -712,8 +713,8 @@ OnPhyRxEnd(std::string context, Ptr<const Packet> packet)
         auto it = g_ongoingRxEvents.find(nodeId);
         if (it != g_ongoingRxEvents.end() && g_harvesters[staIndex])
         {
-            PhyEvent& rxEvent = it->second;
-            
+            PhyEvent &rxEvent = it->second;
+
             // Calculate ACTUAL reception duration from PHY timing
             Time actualDuration = Simulator::Now() - rxEvent.startTime;
 
@@ -769,8 +770,7 @@ OnPhyRxEnd(std::string context, Ptr<const Packet> packet)
 }
 
 // PHY TX Begin callback - stores TX start information
-void
-OnPhyTxBegin(std::string context, Ptr<const Packet> packet, double txPowerW)
+void OnPhyTxBegin(std::string context, Ptr<const Packet> packet, double txPowerW)
 {
     // Extract node ID from context
     std::string nodeIdStr = context.substr(10); // Skip "/NodeList/"
@@ -807,8 +807,7 @@ OnPhyTxBegin(std::string context, Ptr<const Packet> packet, double txPowerW)
 }
 
 // PHY TX End callback - calculates actual TX duration and logs consumption
-void
-OnPhyTxEnd(std::string context, Ptr<const Packet> packet)
+void OnPhyTxEnd(std::string context, Ptr<const Packet> packet)
 {
     // Extract node ID from context
     std::string nodeIdStr = context.substr(10); // Skip "/NodeList/"
@@ -829,26 +828,27 @@ OnPhyTxEnd(std::string context, Ptr<const Packet> packet)
         auto it = g_ongoingTxEvents.find(nodeId);
         if (it != g_ongoingTxEvents.end() && g_harvesters[staIndex])
         {
-            PhyEvent& txEvent = it->second;
-            
+            PhyEvent &txEvent = it->second;
+
             // Calculate ACTUAL transmission duration from PHY timing
             Time actualDuration = Simulator::Now() - txEvent.startTime;
 
             // Calculate estimated duration for comparison
             Time estimatedDuration = CalculateWiFiPacketDuration(
                 Create<Packet>(txEvent.packetSize), g_ulDataRate, false);
-            
+
             // Calculate difference between estimate and actual
             double durationDiffUs = actualDuration.GetMicroSeconds() - estimatedDuration.GetMicroSeconds();
             double durationDiffPercent = (durationDiffUs / estimatedDuration.GetMicroSeconds()) * 100.0;
-            
+
             // Calculate the implied data rate from actual duration
             // actual_duration = PHY_overhead + (packet_bits / data_rate)
             // data_rate = packet_bits / (actual_duration - PHY_overhead)
             double phyOverheadUs = 32.0; // μs
             double dataDurationUs = actualDuration.GetMicroSeconds() - phyOverheadUs;
             double impliedDataRateMbps = 0.0;
-            if (dataDurationUs > 0) {
+            if (dataDurationUs > 0)
+            {
                 double packetBits = txEvent.packetSize * 8.0;
                 impliedDataRateMbps = packetBits / dataDurationUs; // Mbits/μs = Mbps
             }
@@ -860,20 +860,20 @@ OnPhyTxEnd(std::string context, Ptr<const Packet> packet)
             // Log BEFORE deduction for comparison
             double vcapBefore = g_harvesters[staIndex]->GetVcap();
             double energyBefore = g_harvesters[staIndex]->GetAvailableEnergy();
-            
+
             // NOW deduct energy based on ACTUAL PHY transmission duration
             g_harvesters[staIndex]->SetConsumedEnergy(txEvent.powerDbm, actualDuration);
-            
+
             // Log AFTER deduction
             double availableEnergy = g_harvesters[staIndex]->GetAvailableEnergy();
             double vcap = g_harvesters[staIndex]->GetVcap();
             bool outputEnabled = g_harvesters[staIndex]->IsOutputEnabled();
-            
+
             NS_LOG_DEBUG("STA " << nodeId << " energy deduction (ACTUAL PHY):"
-                        << " Vcap: " << vcapBefore << "V → " << vcap << "V"
-                        << " | Energy: " << std::scientific << std::setprecision(3)
-                        << energyBefore << "J → " << availableEnergy << "J"
-                        << " | Consumed: " << consumedEnergy << "J");
+                                << " Vcap: " << vcapBefore << "V → " << vcap << "V"
+                                << " | Energy: " << std::scientific << std::setprecision(3)
+                                << energyBefore << "J → " << availableEnergy << "J"
+                                << " | Consumed: " << consumedEnergy << "J");
 
             // Update statistics with actual consumed energy
             if (staIndex < g_staStats.size())
@@ -903,7 +903,7 @@ OnPhyTxEnd(std::string context, Ptr<const Packet> packet)
             NS_LOG_INFO("STA " << nodeId << " TX End: " << txEvent.powerDbm << " dBm"
                                << " | Estimated: " << estimatedDuration.GetMicroSeconds() << " μs"
                                << " | ACTUAL: " << actualDuration.GetMicroSeconds() << " μs"
-                               << " | Diff: " << std::fixed << std::setprecision(1) << durationDiffUs << " μs (" 
+                               << " | Diff: " << std::fixed << std::setprecision(1) << durationDiffUs << " μs ("
                                << std::setprecision(1) << durationDiffPercent << "%)"
                                << " | Packet: " << txEvent.packetSize << " bytes"
                                << " | Implied rate: " << std::setprecision(2) << impliedDataRateMbps << " Mbps"
@@ -917,19 +917,18 @@ OnPhyTxEnd(std::string context, Ptr<const Packet> packet)
     }
 }
 
-int
-main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     // Simulation parameters
     double simulationTime = 180.0; // seconds
-    double apTxPowerDbm = 55.0;   // AP transmission power (increased to 45 dBm)
-    double staTxPowerDbm = 15.0;  // STA transmission power (increased to 15 dBm)
+    double apTxPowerDbm = 55.0;    // AP transmission power (increased to 45 dBm)
+    double staTxPowerDbm = 15.0;   // STA transmission power (increased to 15 dBm)
 
     // Data rate and MCS configuration
     // Using SLOWEST possible rate (1 Mbps DSSS) for STAs to ensure maximum predictability and energy efficiency
-    double dlDataRate = 54.0;     // Mbps - Downlink data rate
-    double ulDataRate = 1.0;      // Mbps - Uplink data rate (SLOWEST: 1 Mbps DSSS for maximum predictability)
-    std::string dlMcs = "HtMcs7"; // Downlink MCS (54 Mbps)
+    double dlDataRate = 54.0;            // Mbps - Downlink data rate
+    double ulDataRate = 1.0;             // Mbps - Uplink data rate (SLOWEST: 1 Mbps DSSS for maximum predictability)
+    std::string dlMcs = "HtMcs7";        // Downlink MCS (54 Mbps)
     std::string ulMcs = "DsssRate1Mbps"; // Uplink: SLOWEST rate (1 Mbps DSSS) for constant timing and energy efficiency
 
     // Packet size configuration
@@ -1066,11 +1065,11 @@ main(int argc, char* argv[])
     // === WIFI SETUP ===
     WifiHelper wifi;
     wifi.SetStandard(WIFI_STANDARD_80211b); // Use 802.11b for slowest, most predictable rates
-    
+
     // Use 1 Mbps DSSS rate for ALL transmissions - SLOWEST possible rate for maximum predictability
     wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager",
                                  "DataMode",
-                                 StringValue("DsssRate1Mbps"),    // 1 Mbps DSSS for all data
+                                 StringValue("DsssRate1Mbps"), // 1 Mbps DSSS for all data
                                  "ControlMode",
                                  StringValue("DsssRate1Mbps"), // 1 Mbps DSSS for control frames
                                  "NonUnicastMode",
@@ -1078,7 +1077,7 @@ main(int argc, char* argv[])
 
     YansWifiPhyHelper phy;
     phy.SetChannel(channelHelper.Create());
-    
+
     // Configure AP TX power with explicit power levels to override defaults
     phy.Set("TxPowerStart", DoubleValue(apTxPowerDbm));
     phy.Set("TxPowerEnd", DoubleValue(apTxPowerDbm));
@@ -1096,7 +1095,7 @@ main(int argc, char* argv[])
                 "BeaconGeneration",
                 BooleanValue(true));
     NetDeviceContainer apDevice = wifi.Install(phy, mac, apNode);
-    
+
     // Set basic rates for AP to 1 Mbps DSSS only (after device creation)
     Ptr<WifiNetDevice> apWifiDevice = DynamicCast<WifiNetDevice>(apDevice.Get(0));
     if (apWifiDevice)
@@ -1115,13 +1114,13 @@ main(int argc, char* argv[])
     phy.Set("TxPowerLevels", UintegerValue(1)); // Single power level = constant power
 
     // Disable fragmentation and RTS/CTS to avoid rate fallback
-    mac.SetType("ns3::StaWifiMac", 
-                "Ssid", SsidValue(ssid), 
+    mac.SetType("ns3::StaWifiMac",
+                "Ssid", SsidValue(ssid),
                 "ActiveProbing", BooleanValue(false),
                 "MaxMissedBeacons", UintegerValue(1000)); // Prevent disconnections
-    
+
     NetDeviceContainer staDevices = wifi.Install(phy, mac, staNodes);
-    
+
     // Force disable RTS/CTS and set high fragmentation threshold on all STA devices
     Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/RemoteStationManager/RtsCtsThreshold", UintegerValue(999999));
     Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/RemoteStationManager/FragmentationThreshold", UintegerValue(999999));
@@ -1182,7 +1181,7 @@ main(int argc, char* argv[])
         std::string capName, voltName;
 
         // Use configuration from file (file uses 0-based indexing) - REQUIRED
-        const HarvesterConfig& config = harvesterConfigs[i - 1];
+        const HarvesterConfig &config = harvesterConfigs[i - 1];
         capClass = config.capacitorClass;
         voltClass = config.voltageClass;
         capName = config.capacitorName;
@@ -1225,18 +1224,18 @@ main(int argc, char* argv[])
     Ipv4InterfaceContainer interfaces = ipv4.Assign(NetDeviceContainer(apDevice, staDevices));
 
     // ═══════════════════════════════════════════════════════════════════
-    // PCAP LOGGING - CAPTURE ALL TRANSMISSIONS  
+    // PCAP LOGGING - CAPTURE ALL TRANSMISSIONS
     // ═══════════════════════════════════════════════════════════════════
-    
+
     std::cout << "\n📄 Enabling PCAP logging for ALL transmissions..." << std::endl;
-    
+
     // Enable Radiotap headers BEFORE EnablePcap calls
     phy.SetPcapDataLinkType(WifiPhyHelper::DLT_IEEE802_11_RADIO);
-    
+
     // Enable PCAP on AP - files will be saved in powercast_hardware/ph-pcap/
     phy.EnablePcap("contrib/ai/examples/powercast_hardware/ph-pcap/ph-harvester-demo-ap", apDevice.Get(0));
     std::cout << "   ✅ AP PCAP: contrib/ai/examples/powercast_hardware/ph-pcap/ph-harvester-demo-ap-0-0.pcap" << std::endl;
-    
+
     // Enable PCAP on all STAs
     for (uint32_t i = 0; i < numSTAs; ++i)
     {
@@ -1244,11 +1243,11 @@ main(int argc, char* argv[])
         phy.EnablePcap(pcapPrefix, staDevices.Get(i));
         std::cout << "   ✅ STA " << (i + 1) << " PCAP: contrib/ai/examples/powercast_hardware/ph-pcap/ph-harvester-demo-sta-" << (i + 1) << "-0-0.pcap" << std::endl;
     }
-    
+
     std::cout << "📄 PCAP files will capture ALL WiFi frames (data, management, control)" << std::endl;
     std::cout << "📡 Radiotap headers ENABLED - includes RX power (signal strength) information!" << std::endl;
     std::cout << "📂 All PCAP files saved in: contrib/ai/examples/powercast_hardware/ph-pcap/ directory" << std::endl;
-    
+
     // ═══════════════════════════════════════════════════════════════════
     // END OF PCAP LOGGING SETUP
     // ═══════════════════════════════════════════════════════════════════
@@ -1268,7 +1267,7 @@ main(int argc, char* argv[])
         client->Setup(
             InetSocketAddress(interfaces.GetAddress(0), 9),
             ulPayloadSize,     // Use uplink payload size
-            10000,              // Max packets
+            10000,             // Max packets
             MilliSeconds(500), // Mean interval: 500ms for ~2 transmissions/second (random)
             i,                 // STA index for energy checking
             staTxPowerDbm,     // TX power for energy calculation
@@ -1331,7 +1330,7 @@ main(int argc, char* argv[])
 
     // NOTE: Detailed CSV export removed to avoid duplication - all data is already captured in ph-harvester-demo-log.csv
     // Secondary CSV export was redundant as the main logging system captures all simulation events
-    
+
     std::cout << "\n📊 All simulation data logged to: contrib/ai/examples/powercast_hardware/ph-pcap/ph-harvester-demo-log.csv" << std::endl;
     std::cout << "\n🔋 Energy Performance Summary:" << std::endl;
 

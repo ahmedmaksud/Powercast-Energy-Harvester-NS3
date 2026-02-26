@@ -1,9 +1,5 @@
 /*
- * Copyright (c) 2024 IPCCC Project
- *
- * Authors: Ahmed Maksud <amaks002@ucr.edu>
- *          SHINE Lab, Texas State University
- *          PI: Marcelo Menezes De Carvalho
+ * Copyright (c) 2025 Texas State University
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -11,16 +7,21 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: IPCCC Team
- *
- * ph_powercast_energy_harvester_helper.h - Advanced PowerCast Deployment Helper
+ * Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+ * PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
+ * Texas State University
+ */
+
+/**
+ * @file ph-deployment-helper.h
+ * @brief Advanced PowerCast Deployment Helper
  *
  * Production-grade helper class for large-scale deployment of PowerCast energy harvesters
  * with comprehensive file-based configuration, template management, and flexible assignment
@@ -100,11 +101,13 @@ class PowercastEnergyHarvesterHelper : public EnergyHarvesterHelper
      * \brief Deployment templates for common scenarios
      *
      * Predefined templates based on P21XXCSR-EVB configurations:
-     * - UNIFORM_A1: All devices use 50mF capacitor, 1.2V thresholds
-     * - UNIFORM_B2: All devices use 2200μF capacitor, 0.9V thresholds
+     * - UNIFORM_A1: All devices use CLASS_A capacitor (500μF), 1.2V thresholds
+     * - UNIFORM_B2: All devices use CLASS_B capacitor (2200μF), 0.9V thresholds
      * - MIXED_DEPLOYMENT: Mixed capacitor and voltage classes
      * - HIGH_CAPACITY: All devices use large capacitors (A or C)
      * - LOW_POWER: All devices use 0.7V thresholds for low-power operation
+     *
+     * Note: Actual capacitor values are loaded from config file.
      */
     enum DeploymentTemplate
     {
@@ -153,8 +156,10 @@ class PowercastEnergyHarvesterHelper : public EnergyHarvesterHelper
      * Reads node configurations from text file with format:
      * NodeID CapacitorClass VoltageClass
      *
-     * CapacitorClass: A (50mF), B (2200μF), C (200mF)
+     * CapacitorClass: A (500μF), B (2200μF), C (20000μF)
      * VoltageClass: 1 (1.2V), 2 (0.9V), 3 (0.7V)
+     *
+     * Note: Actual values loaded from config file header.
      *
      * \param filename Configuration file path
      * \return true if successful, false otherwise

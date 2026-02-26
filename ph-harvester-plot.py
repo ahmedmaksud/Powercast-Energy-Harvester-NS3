@@ -1,19 +1,33 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025 Texas State University
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation;
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+# PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
+# Texas State University
+
 """
 PowerCast Energy Harvesting Visualization Script
 
-Authors: Ahmed Maksud <amaks002@ucr.edu>
-         SHINE Lab, Texas State University
-         PI: Marcelo Menezes De Carvalho
-
-
+This script provides comprehensive visualization and analysis tools for
+PowerCast RF energy harvesting simulation data exported from NS-3.
 
 Usage:
   python3 ph-harvester-plot.py --csv-file ph-pcap/ph-harvester-demo-log.csv
   python3 ph-harvester-plot.py --csv-file ph-pcap/ph-harvester-demo-log.csv --sta-id 1
-
-Date: 2025
-"""
+"
 
 import pandas as pd
 import matplotlib.pyplot as plt

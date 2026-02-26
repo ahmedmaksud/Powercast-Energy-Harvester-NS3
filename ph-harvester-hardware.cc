@@ -1,9 +1,5 @@
 /*
- * Copyright (c) 2024 IPCCC Project
- *
- * Authors: Ahmed Maksud <amaks002@ucr.edu>
- *          SHINE Lab, Texas State University
- *          PI: Marcelo Menezes De Carvalho
+ * Copyright (c) 2025 Texas State University
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -11,16 +7,21 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Ahmed Maksud
- *
- * ph_powercast_energy_harvester.cc - Advanced PowerCast RF Energy Harvester Implementation
+ * Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+ * PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
+ * Texas State University
+ */
+
+/**
+ * @file ph-harvester-hardware.cc
+ * @brief Advanced PowerCast RF Energy Harvester Implementation
  *
  * Implementation of a production-grade RF energy harvesting device based on P21XXCSR-EVB
  * Band 6 specifications with advanced energy management, safety mechanisms, and realistic
