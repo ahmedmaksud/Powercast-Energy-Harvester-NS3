@@ -27,7 +27,7 @@ PowerCast RF energy harvesting simulation data exported from NS-3.
 Usage:
   python3 ph-harvester-plot.py --csv-file ph-pcap/ph-harvester-demo-log.csv
   python3 ph-harvester-plot.py --csv-file ph-pcap/ph-harvester-demo-log.csv --sta-id 1
-"
+"""
 
 import pandas as pd
 import matplotlib.pyplot as plt

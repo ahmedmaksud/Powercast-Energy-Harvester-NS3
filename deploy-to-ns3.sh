@@ -17,13 +17,13 @@
 # Usage: ./deploy-to-ns3.sh (from Powercast-Energy-Harvester-NS3 directory)
 # Deploys to: ~/NS3-project/ns-allinone-3.44/ns-3.44/contrib/ai/examples/powercast_hardware/
 
-set -e  # Exit immediately if any command fails
+set -e # Exit immediately if any command fails
 
 # Source directory (where this script lives)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # NS-3 paths
-NS3_ROOT="$HOME/NS3-project/ns-allinone-3.44/ns-3.44"
+NS3_ROOT="$SCRIPT_DIR/../ns-allinone-3.44/ns-3.44"
 EXAMPLES_DIR="$NS3_ROOT/contrib/ai/examples"
 DEPLOY_DIR="$EXAMPLES_DIR/powercast_hardware"
 
@@ -74,11 +74,15 @@ else
 	echo "⚠ Warning: $CMAKE_FILE not found"
 fi
 
-# Build NS-3
+# Configure and Build NS-3
+echo ""
+echo "Configuring NS-3 (required to register new targets)..."
+cd "$NS3_ROOT"
+./ns3 configure --enable-examples --enable-tests
+
 echo ""
 echo "Building NS-3..."
-cd "$NS3_ROOT"
-./ns3 build ph-harvester-demo
+./ns3 build
 
 # Run the harvester demo
 echo ""
@@ -91,8 +95,19 @@ echo "Generating plots..."
 cd "$DEPLOY_DIR"
 
 # Try to find and activate virtual environment
-VENV_PATHS=(
-	"$HOME/NS3-project/EHRL/bin/activate"
+# Read venv name from the installation repo's venv_name.txt
+VENV_NAME=""
+VENV_FILE="$SCRIPT_DIR/../NS3-NS3AI--installation-and-tests/venv_name.txt"
+if [ -f "$VENV_FILE" ]; then
+	VENV_NAME=$(cat "$VENV_FILE" | tr -d '\n\r' | xargs)
+fi
+
+VENV_PATHS=()
+if [ -n "$VENV_NAME" ]; then
+	VENV_PATHS+=("$SCRIPT_DIR/../$VENV_NAME/bin/activate")
+fi
+VENV_PATHS+=(
+	"$SCRIPT_DIR/../EHRL/bin/activate"
 	"$SCRIPT_DIR/venv/bin/activate"
 )
 
