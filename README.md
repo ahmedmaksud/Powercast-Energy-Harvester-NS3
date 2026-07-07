@@ -23,7 +23,7 @@
 
 ## Overview
 
-Production-grade NS-3 implementation of the **PowerCast P21XXCSR-EVB Band 6** RF energy harvester for realistic 2.4GHz WiFi energy harvesting simulations. This module provides accurate modeling of energy harvesting hardware with comprehensive safety mechanisms and flexible deployment configurations.
+NS-3 implementation of the **PowerCast P21XXCSR-EVB Band 6** RF energy harvester for realistic 2.4GHz WiFi energy harvesting simulations. This module models energy-harvesting hardware with safety mechanisms and flexible deployment configurations.
 
 **Author:** Ahmed Maksud <ahmed.maksud@email.ucr.edu>  
 **PI:** Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>  
