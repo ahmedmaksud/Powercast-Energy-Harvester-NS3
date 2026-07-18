@@ -95,6 +95,39 @@ python3 ph-harvester-plot.py --csv-file ph-pcap/ph-harvester-demo-log.csv
 | `--dlMcs`      | HtMcs7         | Downlink MCS mode                    |
 | `--configFile` | (default path) | Path to harvester configuration file |
 
+## Example Results
+
+The [`ph-pcap/`](ph-pcap/) directory contains reference artifacts from a default run (`--time=180 --numStas=8`) so you can inspect expected output without building NS-3:
+
+- **`*_analysis.png`** — per-STA energy plots (one per station)
+- **`*.pcap`** — packet captures for the AP and each STA (open in Wireshark)
+- **`ph-harvester-demo-log.csv`** — the full event log the plots are generated from
+
+### Effect of Capacitor Size
+
+STA 1, 4, and 7 all use the **1.2 V voltage class** but step through the three capacitor classes, isolating the effect of storage size. All three harvest ~3×10⁻⁴ J from the same RF environment, yet the larger reservoir sustains far more transmissions:
+
+| STA | Capacitor | Total Harvested | Total Consumed | TX Success Rate |
+| --- | --------------- | --------------- | -------------- | --------------- |
+| 1   | 500 µF (Class A)   | 2.99×10⁻⁴ J | 2.68×10⁻⁴ J | **4.3%** (16 / 371) |
+| 4   | 2200 µF (Class B)  | 2.93×10⁻⁴ J | 5.37×10⁻⁴ J | **8.6%** (32 / 372) |
+| 7   | 20000 µF (Class C) | 3.01×10⁻⁴ J | 4.85×10⁻³ J | **59.5%** (301 / 506) |
+
+![STA 1 — 500 µF Class A capacitor](ph-pcap/ph-harvester-demo-log_sta1_analysis.png)
+
+*Class A (500 µF): the small capacitor charges and drains rapidly, producing a sawtooth Vcap trace. It clamps at Vmax twice, but most transmissions are blocked for lack of stored energy.*
+
+![STA 4 — 2200 µF Class B capacitor](ph-pcap/ph-harvester-demo-log_sta4_analysis.png)
+
+*Class B (2200 µF): early bursts drain Vcap down to Vmin, after which it recovers slowly and climbs steadily — a modestly higher success rate than Class A.*
+
+![STA 7 — 20000 µF Class C capacitor](ph-pcap/ph-harvester-demo-log_sta7_analysis.png)
+
+*Class C (20000 µF): the large reservoir holds enough charge to keep Vcap near Vmin while sustaining a steady stream of transmissions — a 59.5% success rate on the same input power.*
+
+The remaining stations (STA 2, 3, 5, 6, 8) exercise the other capacitor/voltage-class combinations; their plots are in [`ph-pcap/`](ph-pcap/).
+
+
 ## Key Features
 
 ### Hardware Modeling
